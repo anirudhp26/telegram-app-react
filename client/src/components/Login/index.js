@@ -27,22 +27,24 @@ export default function Login() {
 	}
 	return (
 		<>
-			<div>
+			<div className="auth-area" style={{ display: 'flex', flexDirection: 'column', margin: '4vh auto', width: '20%', justifyContent: 'space-between' }}>
 				<input
 					type="text"
+					style={{ margin: '1rem auto'}}
 					placeholder="Enter the mobile number ...."
 					onChange={(e) => {
 						setPhonenumber(e.target.value);
 					}}
 				></input>
-				<button onClick={handleLogin}>Verify</button>
-					<input type="text" onChange={(e) => {setCode(e.target.value)}}></input>
-					<button onClick={() => {otphandle()}}>vERIFY OTP</button>
+					
+				<button onClick={handleLogin} style={{ margin: '1rem auto'}}>Verify</button>
+					<input type="text" style={{ margin: '1rem auto'}} placeholder="Enter otp" onChange={(e) => {setCode(e.target.value)}}></input>
+					<button onClick={() => {otphandle()}} style={{ margin: '1rem auto'}}>vERIFY OTP</button>
 			</div>
-			<div>
-				<input type="text" placeholder="channel name" onChange={(e) => {setTitle(e.target.value)}}></input>
-				<input type="text" placeholder="desc" onChange={(e) => {setDesc(e.target.value)}}></input>
-				<button onClick={() => {handleCreateChannel()}}>create channel</button>
+			<div className="channel-area" style={{ display: 'flex', flexDirection: 'column', margin: '4vh auto', width: '20%', justifyContent: 'space-between' }}>
+				<input type="text" placeholder="channel name" style={{ margin: '1rem auto'}} onChange={(e) => {setTitle(e.target.value)}}></input>
+				<input type="text" style={{ margin: '1rem auto'}} placeholder="desc" onChange={(e) => {setDesc(e.target.value)}}></input>
+				<button style={{ margin: '1rem auto'}} onClick={() => {handleCreateChannel()}}>create channel</button>
 			</div>
 		</>
 	);
