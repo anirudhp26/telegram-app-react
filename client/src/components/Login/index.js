@@ -22,7 +22,7 @@ export default function Login() {
 	}
 
 	const handleCreateChannel = async () => {
-		const responce = await axios.post("http://localhost:5000/createChannel", { title: title, description: desc});
+		const responce = await axios.post("http://localhost:5000/createChannel", { title: title, description: desc, phonenumber: phonenumber });
 		console.log(responce);
 	}
 	return (

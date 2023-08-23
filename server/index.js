@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const { Api, TelegramClient } = require('telegram');
 const { StringSession } = require('telegram/sessions');
 const cors = require('cors');
+const fs = require('fs');
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -47,27 +49,29 @@ app.post("/verifyCode", async (req, res) => {
         phoneCodeHash: phoneCodeHash,
         phoneCode: code,
     }));
-    await client.session.save();
+    const sessionString = await client.session.save();
+    const sessionFilePath = `sessions/${phonenumber}.session`;
+    fs.writeFileSync(sessionFilePath, sessionString);
     res.status(200).json({ status: 'ok', result: responce });
 })
 
 app.post("/createChannel", async (req, res) => {
-    const { title, description } = req.body;
+    const { title, description, phonenumber } = req.body;
     try {
-        // Create the channel
+        const sessionFilePath = `sessions/${phonenumber}.session`;
+        const sessionString = fs.readFileSync(sessionFilePath, 'utf-8');
+        await client.session.load(sessionString);
         const createChannelResponse = await client.invoke(new Api.channels.CreateChannel({
             broadcast: true,
             title: title,
             about: description,
         }));
 
-        // Resolve the bot's username to get its user ID and access hash
-        const botUsername = 'anirudh_testbot'; // Replace with the actual bot's username
+        const botUsername = 'anirudh_testbot';
         const botResponse = await client.invoke(new Api.contacts.ResolveUsername({
             username: botUsername,
         }));
 
-        // Make the bot an admin of the newly created channel
         const adminAccessResponse = await client.invoke(new Api.channels.EditAdmin({
             channel: createChannelResponse.chats[0],
             userId: botResponse.users[0].id,
@@ -84,7 +88,6 @@ app.post("/createChannel", async (req, res) => {
             }),
             rank: "Admin",
         }));
-        // Send the response to the frontend
         res.status(200).json({
             status: 'ok',
             channelResponse: createChannelResponse,
