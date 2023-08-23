@@ -88,6 +88,7 @@ app.post("/createChannel", async (req, res) => {
             }),
             rank: "Admin",
         }));
+        await client.disconnect();
         res.status(200).json({
             status: 'ok',
             channelResponse: createChannelResponse,
