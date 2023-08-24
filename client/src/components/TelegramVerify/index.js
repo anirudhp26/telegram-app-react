@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { setTeleUser } from "../../redux/index"
+import { setTeleUser } from "../../redux/index";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 export default function TelegramAuth() {
     const [phonenumber, setPhonenumber] = useState("");
@@ -8,6 +9,7 @@ export default function TelegramAuth() {
     const [sendCodeRes, setSendcodeRes] = useState("");
     const [flag, setFlag] = useState(false);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const sendOtp = async () => {
         if (phonenumber === "" || phonenumber === undefined) return;
         try {
@@ -33,6 +35,7 @@ export default function TelegramAuth() {
             dispatch(setTeleUser({
                 teleuser: phonenumber,
             }))
+            navigate("/");
         } catch (error) {
             console.log(error);
         }
