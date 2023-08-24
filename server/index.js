@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-    origin: ["http://localhost:3000","https://phoneauth-e0079.web.app"], 
+    origin: ["http://localhost:3000","https://phoneauth-e0079.web.app", "https://telegram-app-react-j4sx.vercel.app"], 
     credentials: true,
     methods: ["GET", "POST"]
 }))

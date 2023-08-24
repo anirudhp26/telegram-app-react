@@ -16,7 +16,7 @@ export default function Home() {
         const responce = await axios.post("https://telegram-app-react.vercel.app/createChannel", { title: ctitle, description: cdesc, phonenumber: teleuser });
         console.log(responce);
         dispatch(setChannelInfo({
-            channelInfo: responce.data.channelResponce
+            channelInfo: responce.data.channelResponse,
         }))
     }
     return (
@@ -72,7 +72,7 @@ export default function Home() {
                     <div className="page-header">
                         <h2 className="h3"> Welcome {teleuser ? teleuser : user} </h2>
                     </div>
-                    {channelInfo === null || channelInfo === "" || channelInfo === "null"  ?
+                    {channelInfo === null || channelInfo === "" || channelInfo === "null" || channelInfo === undefined  ?
                         <form className="pt-3">
                             <div className="form-group">
                                 <input type="text" className="form-control form-control-lg" placeholder="Channel Name" onChange={(e) => { setCtitle(e.target.value) }} />
@@ -87,7 +87,7 @@ export default function Home() {
                         :
                         <></>
                     }
-                    {channelInfo === null || channelInfo === "" || channelInfo === "null" ?
+                    {channelInfo === null || channelInfo === "" || channelInfo === "null" || channelInfo === undefined ?
                         <>
                         </>
                         :
