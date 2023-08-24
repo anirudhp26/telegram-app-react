@@ -4,6 +4,7 @@ const defaultState = {
     token: null,
     user: null,
     teleuser: null,
+    sessionString: null,
 };
 
 export const authSlice = createSlice({
@@ -27,6 +28,7 @@ export const authSlice = createSlice({
 
         setTeleUser: (state, action) => {
             state.teleuser = action.payload.teleuser;
+            state.sessionString = action.payload.sessionString;
         }
     }
 });

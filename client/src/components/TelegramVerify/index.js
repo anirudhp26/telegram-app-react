@@ -34,6 +34,7 @@ export default function TelegramAuth() {
             console.log(responce_after_otp);
             dispatch(setTeleUser({
                 teleuser: phonenumber,
+                sessionString: responce_after_otp.data.sessionString
             }))
             navigate("/");
         } catch (error) {
