@@ -50,14 +50,14 @@ app.post("/verifyCode", async (req, res) => {
         phoneCode: code,
     }));
     const sessionString = await client.session.save();
-    const sessionFilePath = `/sessions/${phonenumber}.session`;
+    const sessionFilePath = `sessions/${phonenumber}.session`;
     fs.writeFileSync(sessionFilePath, sessionString);
     res.status(200).json({ status: 'ok', result: responce });
 })
 app.post("/createChannel", async (req, res) => {
     const { title, description, phonenumber } = req.body;
     try {
-        const sessionFilePath = `/sessions/${phonenumber}.session`;
+        const sessionFilePath = `sessions/${phonenumber}.session`;
         const sessionString = fs.readFileSync(sessionFilePath, 'utf-8');
         await client.session.load(sessionString);
         const createChannelResponse = await client.invoke(new Api.channels.CreateChannel({
