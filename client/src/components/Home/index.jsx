@@ -9,9 +9,11 @@ export default function Home() {
     const user = useSelector((state) => state.user);
     const channelInfo = useSelector((state) => state.channelInfo);
     const dispatch = useDispatch();
+
     const handleLogout = async () => {
         dispatch(setLogout());
     }
+
     const handleCreateChannel = async () => {
         const responce = await axios.post("https://telegram-app-react.vercel.app/createChannel", { title: ctitle, description: cdesc, phonenumber: teleuser });
         console.log(responce);
@@ -19,6 +21,7 @@ export default function Home() {
             channelInfo: responce.data.channelResponse,
         }))
     }
+
     return (
         <div className="container-fluid page-body-wrapper">
             <nav className="sidebar sidebar-offcanvas vh-100" id="sidebar">
@@ -72,29 +75,28 @@ export default function Home() {
                     <div className="page-header">
                         <h2 className="h3"> Welcome {teleuser ? teleuser : user} </h2>
                     </div>
-                    {channelInfo === null || channelInfo === "" || channelInfo === "null" || channelInfo === undefined  ?
-                        <form className="pt-3">
-                            <div className="form-group">
-                                <input type="text" className="form-control form-control-lg" placeholder="Channel Name" onChange={(e) => { setCtitle(e.target.value) }} />
-                            </div>
-                            <div className="form-group">
-                                <input type="text" className="form-control form-control-lg" placeholder="Channel Description" onChange={(e) => { setCdesc(e.target.value) }} />
-                            </div>
-                            <div className="mt-3" >
-                                <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => { handleCreateChannel() }}>Create Channel</p>
-                            </div>
-                        </form>
-                        :
-                        <></>
-                    }
-                    {channelInfo === null || channelInfo === "" || channelInfo === "null" || channelInfo === undefined ?
-                        <>
-                        </>
-                        :
-                        <div className="page-header">
-                            <h2 className="h3"> channel created </h2>
+                    {teleuser && (
+                        <div>
+                            <h2>Telegram User: {teleuser}</h2>
+                            {!channelInfo ? (
+                                <form className="pt-3">
+                                    <div className="form-group">
+                                        <input type="text" className="form-control form-control-lg" placeholder="Channel Name" onChange={(e) => { setCtitle(e.target.value) }} />
+                                    </div>
+                                    <div className="form-group">
+                                        <input type="text" className="form-control form-control-lg" placeholder="Channel Description" onChange={(e) => { setCdesc(e.target.value) }} />
+                                    </div>
+                                    <div className="mt-3" >
+                                        <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => { handleCreateChannel() }}>Create Channel</p>
+                                    </div>
+                                </form>
+                            ) : (
+                                <div className="page-header">
+                                    <h2 className="h3"> channel created </h2>
+                                </div>
+                            )}
                         </div>
-                    }
+                    )}
                     <div className="row">
                         <div className="col-md-3 grid-margin stretch-card">
                             <div className="card  border anyl border-white bg-success text-white text-center">
