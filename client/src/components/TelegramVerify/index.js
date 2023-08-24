@@ -58,10 +58,10 @@ export default function TelegramAuth() {
                                             <input type="text" style={{ display: flag ? "block" : "none" }} className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Enter OTP here" onChange={(e) => { setCode(e.target.value) }} />
                                         </div>
                                         <div className="mt-3" style={{ display: !flag ? "block" : "none" }} >
-                                            <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={sendOtp}>Send OTP</p>
+                                            <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => {sendOtp()}}>Send OTP</p>
                                         </div>
                                         <div className="mt-3" style={{ display: flag ? "block" : "none" }} >
-                                            <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={verifyOtp}>Verify OTP</p>
+                                            <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => {verifyOtp()}}>Verify OTP</p>
                                         </div>
                                     </form>
                                 </div>
