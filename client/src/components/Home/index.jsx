@@ -1,6 +1,20 @@
-import React from 'react'
-
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { setLogout } from '../../redux';
+import axios from 'axios';
 export default function Home() {
+    const [ctitle, setCtitle] = useState("");
+    const [cdesc, setCdesc] = useState("");
+    const teleuser = useSelector((state) => state.teleuser);
+    const user = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+    const handleLogout = async () => {
+        dispatch(setLogout());
+    }
+    const handleCreateChannel = async () => {
+        const responce = await axios.post("https://telegram-app-react.vercel.app/createChannel", { title: ctitle, description: cdesc, phonenumber: teleuser });
+        console.log(responce);
+    }
     return (
         <div className="container-fluid page-body-wrapper">
             <nav className="sidebar sidebar-offcanvas vh-100" id="sidebar">
@@ -11,14 +25,15 @@ export default function Home() {
                     <li className="nav-item nav-profile">
                         <a href="/" className="nav-link">
                             <div className="profile-image">
-                                <img className="img-xs rounded-circle" src="images/faces/face12.jpg" alt="profile"/>
-                                    <div className="dot-indicator bg-success"></div>
+                                <img className="img-xs rounded-circle" src="images/faces/face12.jpg" alt="profile" />
+                                <div className="dot-indicator bg-success"></div>
                             </div>
                             <div className="text-wrapper">
-                                <p className="profile-name">User</p>
+                                <p className="profile-name">{teleuser ? teleuser : "USER"}</p>
                                 <p className="designation">Profile</p>
                             </div>
                         </a>
+                        <p onClick={handleLogout} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">Logout</p>
                     </li>
                     <li className="nav-item nav-category">
                         <span className="nav-link">Dashboard</span>
@@ -38,7 +53,7 @@ export default function Home() {
                             <ul className="nav flex-column sub-menu">
                                 <li className="nav-item"> <a className="nav-link" href="/">Payment Page</a></li>
                                 <li className="nav-item"> <a className="nav-link" href="/">Locked Content</a></li>
-                                <li className="nav-item"> <a className="nav-link" href="/">Telegram</a></li>
+                                <li className="nav-item"> <a className="nav-link" href="/telegramauth">Telegram</a></li>
                             </ul>
                         </div>
                     </li>
@@ -50,6 +65,22 @@ export default function Home() {
                     <div className="page-header">
                         <h2 className="h2"> Home </h2>
                     </div>
+                    <div className="page-header">
+                        <h2 className="h3"> Welcome {teleuser ? teleuser : user} </h2>
+                    </div>
+                    {teleuser ?
+                        <form className="pt-3">
+                            <div className="form-group">
+                                <input type="text" className="form-control form-control-lg" placeholder="Channel Name" onChange={(e) => { setCtitle(e.target.value) }} />
+                            </div>
+                            <div className="form-group">
+                                <input type="text" className="form-control form-control-lg" placeholder="Channel Description" onChange={(e) => { setCdesc(e.target.value) }} />
+                            </div>
+                            <div className="mt-3" >
+                                <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={handleCreateChannel}>Create Channel</p>
+                            </div>
+                        </form> : <></>
+                    }
                     <div className="row">
                         <div className="col-md-3 grid-margin stretch-card">
                             <div className="card  border anyl border-white bg-success text-white text-center">
