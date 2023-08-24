@@ -72,7 +72,7 @@ export default function Home() {
                     <div className="page-header">
                         <h2 className="h3"> Welcome {teleuser ? teleuser : user} </h2>
                     </div>
-                    {teleuser ?
+                    {channelInfo === null || channelInfo === "" || channelInfo === "null"  ?
                         <form className="pt-3">
                             <div className="form-group">
                                 <input type="text" className="form-control form-control-lg" placeholder="Channel Name" onChange={(e) => { setCtitle(e.target.value) }} />
@@ -81,9 +81,11 @@ export default function Home() {
                                 <input type="text" className="form-control form-control-lg" placeholder="Channel Description" onChange={(e) => { setCdesc(e.target.value) }} />
                             </div>
                             <div className="mt-3" >
-                                <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => {handleCreateChannel()}}>Create Channel</p>
+                                <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => { handleCreateChannel() }}>Create Channel</p>
                             </div>
-                        </form> : <></>
+                        </form>
+                        :
+                        <></>
                     }
                     {channelInfo === null || channelInfo === "" || channelInfo === "null" ?
                         <>
