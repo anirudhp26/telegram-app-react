@@ -4,6 +4,7 @@ const { Api, TelegramClient } = require('telegram');
 const { StringSession } = require('telegram/sessions');
 const cors = require('cors');
 const fs = require('fs');
+const path = require('path');
 
 
 const app = express();
@@ -50,7 +51,7 @@ app.post("/verifyCode", async (req, res) => {
         phoneCode: code,
     }));
     const sessionString = await client.session.save();
-    const sessionFilePath = `sessions/${phonenumber}.session`;
+    const sessionFilePath = path.join(process.cwd(),`sessions/${phonenumber}.session`);
     fs.writeFileSync(sessionFilePath, sessionString);
     res.status(200).json({ status: 'ok', result: responce });
 })
