@@ -50,7 +50,7 @@ app.post("/verifyCode", async (req, res) => {
         phoneCode: code,
     }));
     const sessionString = await client.session.save();
-    const sessionFilePath = `sessions/${phonenumber}.session`;
+    const sessionFilePath = `./sessions/${phonenumber}.session`;
     fs.writeFileSync(sessionFilePath, sessionString);
     res.status(200).json({ status: 'ok', result: responce });
 })

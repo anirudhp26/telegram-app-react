@@ -23,7 +23,7 @@ export default function TelegramAuth() {
     };
 
     const verifyOtp = async () => {
-        if (code === "" || code === null || code.length !== 6) return;
+        if (code === "" || code === null || code.length !== 5) return;
         try {
             const responce_after_otp = await axios.post(
                 "https://telegram-app-react.vercel.app/verifyCode",
