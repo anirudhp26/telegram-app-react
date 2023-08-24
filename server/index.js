@@ -4,14 +4,13 @@ const { Api, TelegramClient } = require('telegram');
 const { StringSession } = require('telegram/sessions');
 const cors = require('cors');
 const fs = require('fs');
-const path = require('path');
 
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-    origin: ["http://localhost:3000", "https://phoneauth-e0079.web.app"],
+    origin: ["http://localhost:3000","https://phoneauth-e0079.web.app"], 
     credentials: true,
     methods: ["GET", "POST"]
 }))
@@ -51,14 +50,14 @@ app.post("/verifyCode", async (req, res) => {
         phoneCode: code,
     }));
     const sessionString = await client.session.save();
-    const sessionFilePath = path.join(process.cwd(), `sessions/${phonenumber}.session`);
+    const sessionFilePath = `./sessions/${phonenumber}.session`;
     fs.writeFileSync(sessionFilePath, sessionString);
     res.status(200).json({ status: 'ok', result: responce });
 })
 app.post("/createChannel", async (req, res) => {
     const { title, description, phonenumber } = req.body;
     try {
-        const sessionFilePath = path.join(process.cwd(), `sessions/${phonenumber}.session`);
+        const sessionFilePath = `./sessions/${phonenumber}.session`;
         const sessionString = fs.readFileSync(sessionFilePath, 'utf-8');
         await client.session.load(sessionString);
         const createChannelResponse = await client.invoke(new Api.channels.CreateChannel({
