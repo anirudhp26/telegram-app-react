@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setLogout } from '../../redux';
+import { setChannelInfo, setLogout } from '../../redux';
 import axios from 'axios';
 export default function Home() {
     const [ctitle, setCtitle] = useState("");
     const [cdesc, setCdesc] = useState("");
     const teleuser = useSelector((state) => state.teleuser);
     const user = useSelector((state) => state.user);
+    const channelInfo = useSelector((state) => state.channelInfo);
     const dispatch = useDispatch();
     const handleLogout = async () => {
         dispatch(setLogout());
@@ -14,6 +15,9 @@ export default function Home() {
     const handleCreateChannel = async () => {
         const responce = await axios.post("https://telegram-app-react.vercel.app/createChannel", { title: ctitle, description: cdesc, phonenumber: teleuser });
         console.log(responce);
+        dispatch(setChannelInfo({
+            channelInfo: responce.data.channelResponce
+        }))
     }
     return (
         <div className="container-fluid page-body-wrapper">
@@ -77,9 +81,17 @@ export default function Home() {
                                 <input type="text" className="form-control form-control-lg" placeholder="Channel Description" onChange={(e) => { setCdesc(e.target.value) }} />
                             </div>
                             <div className="mt-3" >
-                                <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={handleCreateChannel}>Create Channel</p>
+                                <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => {handleCreateChannel()}}>Create Channel</p>
                             </div>
                         </form> : <></>
+                    }
+                    {channelInfo === null || channelInfo === "" || channelInfo === "null" ?
+                        <>
+                        </>
+                        :
+                        <div className="page-header">
+                            <h2 className="h3"> channel created </h2>
+                        </div>
                     }
                     <div className="row">
                         <div className="col-md-3 grid-margin stretch-card">

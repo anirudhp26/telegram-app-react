@@ -5,6 +5,7 @@ const defaultState = {
     user: null,
     teleuser: null,
     sessionString: null,
+    channelInfo: null,
 };
 
 export const authSlice = createSlice({
@@ -20,6 +21,8 @@ export const authSlice = createSlice({
             state.user = null;
             state.token = null;
             state.teleuser = null;
+            state.sessionString = null;
+            state.channelInfo = null;
         },
 
         setUser: (state, action) => {
@@ -29,10 +32,14 @@ export const authSlice = createSlice({
         setTeleUser: (state, action) => {
             state.teleuser = action.payload.teleuser;
             state.sessionString = action.payload.sessionString;
+        },
+
+        setChannelInfo: (state, action) => {
+            state.channelInfo = action.payload.channelInfo;
         }
     }
 });
 
-export const { setLogin, setUser, setTeleUser, setLogout } = authSlice.actions;
+export const { setLogin, setUser, setTeleUser, setLogout, setChannelInfo } = authSlice.actions;
 
 export default authSlice.reducer;
