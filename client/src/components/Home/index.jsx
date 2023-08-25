@@ -8,6 +8,7 @@ export default function Home() {
     const teleuser = useSelector((state) => state.teleuser);
     const user = useSelector((state) => state.user);
     const channelInfo = useSelector((state) => state.channelInfo);
+    const sessionString = useSelector((state) => state.sessionString);
     const dispatch = useDispatch();
 
     const handleLogout = async () => {
@@ -15,11 +16,16 @@ export default function Home() {
     }
 
     const handleCreateChannel = async () => {
-        const responce = await axios.post("https://telegram-app-react.vercel.app/createChannel", { title: ctitle, description: cdesc, phonenumber: teleuser });
+        const responce = await axios.post("http://localhost:5000/createChannel", { title: ctitle, description: cdesc, phonenumber: teleuser.phone, sessionString: sessionString });
         console.log(responce);
         dispatch(setChannelInfo({
             channelInfo: responce.data.channelResponse,
         }))
+    }
+
+    const handleExistingChannels = async () => {
+        const responce = await axios.post("http://localhost:5000/getchannels", { sessionString: sessionString, id: teleuser.id });
+        console.log(responce);
     }
 
     return (
@@ -36,7 +42,7 @@ export default function Home() {
                                 <div className="dot-indicator bg-success"></div>
                             </div>
                             <div className="text-wrapper">
-                                <p className="profile-name">{teleuser ? teleuser : "USER"}</p>
+                                <p className="profile-name">{teleuser?.phone ? teleuser.phone : "USER"}</p>
                                 <p className="designation">Profile</p>
                             </div>
                         </a>
@@ -64,7 +70,6 @@ export default function Home() {
                             </ul>
                         </div>
                     </li>
-
                 </ul>
             </nav>
             <div className="main-panel">
@@ -73,11 +78,11 @@ export default function Home() {
                         <h2 className="h2"> Home </h2>
                     </div>
                     <div className="page-header">
-                        <h2 className="h3"> Welcome {teleuser ? teleuser : user} </h2>
+                        <h2 className="h3"> Welcome {teleuser ? teleuser?.phone : user} </h2>
                     </div>
-                    {teleuser && (
+                    {teleuser?.phone && (
                         <div>
-                            <h2>Telegram User: {teleuser}</h2>
+                            <h2>Telegram User: {teleuser.phone}</h2>
                             {!channelInfo ? (
                                 <form className="pt-3">
                                     <div className="form-group">
@@ -97,6 +102,9 @@ export default function Home() {
                             )}
                         </div>
                     )}
+                                    <div className="mt-3" >
+                                        <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => { handleExistingChannels() }}>Existing Channels</p>
+                                    </div>
                     <div className="row">
                         <div className="col-md-3 grid-margin stretch-card">
                             <div className="card  border anyl border-white bg-success text-white text-center">

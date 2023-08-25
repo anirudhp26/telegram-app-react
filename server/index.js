@@ -3,13 +3,14 @@ const bodyParser = require('body-parser');
 const { Api, TelegramClient } = require('telegram');
 const { StringSession } = require('telegram/sessions');
 const cors = require('cors');
+const { chats } = require('telegram/client');
 
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-    origin: ["http://localhost:3000","https://phoneauth-e0079.web.app", "https://telegram-app-react-j4sx.vercel.app"], 
+    origin: ["http://localhost:3000", "https://phoneauth-e0079.web.app", "https://telegram-app-react-j4sx.vercel.app"],
     credentials: true,
     methods: ["GET", "POST"]
 }))
@@ -51,11 +52,15 @@ app.post("/verifyCode", async (req, res) => {
     const sessionString = await client.session.save();
     res.status(200).json({ status: 'ok', result: responce, sessionString });
 })
+
 app.post("/createChannel", async (req, res) => {
-    const { title, description } = req.body;
+    const { title, description, sessionString } = req.body;
     try {
-        const sessionString = req.body.sessionString;
-        await client.session.load(sessionString);
+        const stringSession = new StringSession(sessionString); // fill this later with the value from session.save()
+        const client = new TelegramClient(stringSession, apiId, apiHash, {
+            connectionRetries: 5,
+        });
+        await client.connect();
         const createChannelResponse = await client.invoke(new Api.channels.CreateChannel({
             broadcast: true,
             title: title,
@@ -83,7 +88,7 @@ app.post("/createChannel", async (req, res) => {
             }),
             rank: "Admin",
         }));
-        await client.disconnect();
+        // await client.disconnect();
         res.status(200).json({
             status: 'ok',
             channelResponse: createChannelResponse,
@@ -92,6 +97,34 @@ app.post("/createChannel", async (req, res) => {
     } catch (error) {
         console.error('Create channel error:', error);
         res.status(500).json({ status: 'error', error: error.message });
+    }
+})
+
+app.post("/getchannels", async (req, res) => {
+    const { sessionString, id } = req.body;
+    try {
+        const stringSession = new StringSession(sessionString); // fill this later with the value from session.save()
+        const client = new TelegramClient(stringSession, apiId, apiHash, {
+            connectionRetries: 5,
+        });
+        await client.connect();
+        // const userChannels = await client.invoke(new Api.messages.GetDialogs({
+        //     excludePinned: true,
+        //     offsetDate: 0,
+        //     offsetId: 0,
+        //     offsetPeer: new Api.InputPeerEmpty(),
+        //     limit: 100,
+        // }));
+        const createdChannels = await client.invoke(new Api.messages.GetDialogs({
+            excludePinned: true,
+            offsetDate: 0,
+            offsetId: 0,
+            offsetPeer: new Api.InputPeerEmpty(),
+            limit: 100,
+        }));        
+        res.status(200).json({ status: 'ok', createdChannels: createdChannels.chats });
+    } catch (error) {
+        console.log(error);
     }
 })
 
