@@ -20,7 +20,7 @@ export default function TelegramAuth() {
     const sendOtp = async () => {
         if (phonenumber === "" || phonenumber === undefined) return;
         try {
-            const responce = await axios.post("http://localhost:5000/sendCode", {
+            const responce = await axios.post("https://telegram-app-react.vercel.app/sendCode", {
                 phonenumber: phonenumber,
             });
             setSendcodeRes(responce.data);
@@ -35,7 +35,7 @@ export default function TelegramAuth() {
         if (code === "" || code === null || code.length !== 5) return;
         try {
             const responce_after_otp = await axios.post(
-                "http://localhost:5000/verifyCode",
+                "https://telegram-app-react.vercel.app/verifyCode",
                 { phonenumber: phonenumber, code: code, phoneCodeHash: sendCodeRes.result.phoneCodeHash }
             );
             console.log(responce_after_otp);

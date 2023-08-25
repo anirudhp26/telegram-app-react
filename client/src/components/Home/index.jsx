@@ -21,7 +21,7 @@ export default function Home() {
 
 
     const handleCreateChannel = async () => {
-        const responce = await axios.post("http://localhost:5000/createChannel", { title: ctitle, description: cdesc, phonenumber: teleuser.phone, sessionString: sessionString });
+        const responce = await axios.post("https://telegram-app-react.vercel.app/createChannel", { title: ctitle, description: cdesc, phonenumber: teleuser.phone, sessionString: sessionString });
         console.log(responce);
         dispatch(setChannelInfo({
             channelInfo: responce.data.channelResponse,
@@ -29,7 +29,7 @@ export default function Home() {
     }
 
     const getExistingChannels = async () => {
-        const responce = await axios.post("http://localhost:5000/getchannels", { sessionString: sessionString, id: teleuser.id });
+        const responce = await axios.post("https://telegram-app-react.vercel.app/getchannels", { sessionString: sessionString, id: teleuser.id });
         console.log(responce);
         setExistingChannels(responce.data.createdChannels);
     }
@@ -38,7 +38,7 @@ export default function Home() {
         let accessHash = "";
         existingChannels.map((channel) => {if (channel.id === eChannel)  accessHash = channel.accessHash; return null});
         console.log(accessHash);
-        const responce = await axios.post("http://localhost:5000/addExistingChannel", { channelId: eChannel, accessHash: accessHash, sessionString: sessionString });
+        const responce = await axios.post("https://telegram-app-react.vercel.app/addExistingChannel", { channelId: eChannel, accessHash: accessHash, sessionString: sessionString });
         dispatch(setChannelInfo({
             channelInfo: responce.data,
         }))
