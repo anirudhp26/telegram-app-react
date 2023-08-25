@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { setTeleUser } from "../../redux/index";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -9,7 +9,14 @@ export default function TelegramAuth() {
     const [sendCodeRes, setSendcodeRes] = useState("");
     const [flag, setFlag] = useState(false);
     const dispatch = useDispatch();
+    const sessionString = useSelector((state) => state.sessionString);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (sessionString) {
+            navigate("/");
+        }
+    })
     const sendOtp = async () => {
         if (phonenumber === "" || phonenumber === undefined) return;
         try {

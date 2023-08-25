@@ -99,6 +99,50 @@ app.post("/createChannel", async (req, res) => {
         res.status(500).json({ status: 'error', error: error.message });
     }
 })
+app.post("/addExistingChannel", async (req, res) => {
+    const { channelId, accessHash, sessionString } = req.body;
+    try {
+        const stringSession = new StringSession(sessionString); // fill this later with the value from session.save()
+        const client = new TelegramClient(stringSession, apiId, apiHash, {
+            connectionRetries: 5,
+        });
+        await client.connect();
+        
+        const botUsername = 'anirudh_testbot';
+        const botResponse = await client.invoke(new Api.contacts.ResolveUsername({
+            username: botUsername,
+        }));
+
+        const adminAccessResponse = await client.invoke(new Api.channels.EditAdmin({
+            channel: new Api.InputChannel({
+                channelId: channelId,
+                accessHash: accessHash
+            }),
+            userId: botResponse.users[0].id,
+            adminRights: new Api.ChatAdminRights({
+                changeInfo: true,
+                postMessages: true,
+                editMessages: true,
+                deleteMessages: true,
+                inviteToChannel: true,
+                inviteUsers: true,
+                inviteToChat: true,
+                pinMessages: true,
+                addAdmins: true,
+                manageCall: true,
+            }),
+            rank: "Admin",
+        }));
+        // await client.disconnect();
+        res.status(200).json({
+            status: 'ok',
+            adminAccessResponse: adminAccessResponse,
+        });
+    } catch (error) {
+        console.error('Create channel error:', error);
+        res.status(500).json({ status: 'error', error: error.message });
+    }
+})
 
 app.post("/getchannels", async (req, res) => {
     const { sessionString, id } = req.body;
