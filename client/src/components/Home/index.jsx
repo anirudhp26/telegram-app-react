@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setChannelInfo, setLogout } from '../../redux';
+import { setChannelInfo, setLogout, setTeleUser, setTeleUserLogout } from '../../redux';
 import axios from 'axios';
 export default function Home() {
     const [ctitle, setCtitle] = useState("");
@@ -8,6 +8,7 @@ export default function Home() {
     const [flag, setFlag] = useState(false);
     const [existingChannels, setExistingChannels] = useState([]);
     const [eChannel, setEchannel] = useState("");
+    const [dChannel, setDchannel] = useState("");
     const teleuser = useSelector((state) => state.teleuser);
     // const user = useSelector((state) => state.user);
     const channelInfo = useSelector((state) => state.channelInfo);
@@ -19,29 +20,44 @@ export default function Home() {
         dispatch(setLogout());
     }
 
-
     const handleCreateChannel = async () => {
-        const responce = await axios.post("https://telegram-app-react.vercel.app/createChannel", { title: ctitle, description: cdesc, phonenumber: teleuser.phone, sessionString: sessionString });
+        const responce = await axios.post(`${process.env.REACT_APP_API_URL}/createChannel`, { title: ctitle, description: cdesc, sessionString: sessionString, userid: teleuser.id });
         console.log(responce);
-        dispatch(setChannelInfo({
-            channelInfo: responce.data.channelResponse,
-        }))
+        dispatch(
+            setChannelInfo({
+                channelInfo: responce.data.user[0].managed_channels_by_bot.channels,
+            }),
+            setTeleUser({
+                teleuser: responce.data.user[0]
+            }))
     }
 
     const getExistingChannels = async () => {
-        const responce = await axios.post("https://telegram-app-react.vercel.app/getchannels", { sessionString: sessionString, id: teleuser.id });
+        const responce = await axios.post(`${process.env.REACT_APP_API_URL}/getchannels`, { sessionString: sessionString, id: teleuser.id });
         console.log(responce);
         setExistingChannels(responce.data.createdChannels);
     }
 
     const handleExistingChannels = async () => {
         let accessHash = "";
-        existingChannels.map((channel) => {if (channel.id === eChannel)  accessHash = channel.accessHash; return null});
+        existingChannels.map((channel) => { if (channel.id === eChannel) accessHash = channel.accessHash; return null });
         console.log(accessHash);
-        const responce = await axios.post("https://telegram-app-react.vercel.app/addExistingChannel", { channelId: eChannel, accessHash: accessHash, sessionString: sessionString });
-        dispatch(setChannelInfo({
-            channelInfo: responce.data,
-        }))
+        const responce = await axios.post(`${process.env.REACT_APP_API_URL}/addExistingChannel`, { channelId: eChannel, accessHash: accessHash, sessionString: sessionString });
+        dispatch(
+            setChannelInfo({
+                channelInfo: responce.data,
+            }),
+            setTeleUser({
+                teleuser: responce.data.user[0]
+            })
+        )
+    }
+
+    const handleteleLogout = async () => {
+        const responce = await axios.post(`${process.env.REACT_APP_API_URL}/telegramlogout`, { sessionString: sessionString });
+        if (responce) {
+            dispatch(setTeleUserLogout());
+        }
     }
 
     return (
@@ -58,11 +74,11 @@ export default function Home() {
                                 <div className="dot-indicator bg-success"></div>
                             </div>
                             <div className="text-wrapper">
-                                <p className="profile-name">{teleuser?.phone ? teleuser.phone : "USER"}</p>
+                                <p className="profile-name">{teleuser?.phone_number ? teleuser.phone_number : "USER"}</p>
                                 <p className="designation">Profile</p>
                             </div>
                         </a>
-                        <p onClick={handleLogout} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">Logout</p>
+                        <p onClick={() => { handleLogout() }} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">Logout</p>
                     </li>
                     <li className="nav-item nav-category">
                         <span className="nav-link">Dashboard</span>
@@ -84,13 +100,14 @@ export default function Home() {
                                 <li className="nav-item"> <a className="nav-link" href="/">Locked Content</a></li>
                                 <li className="nav-item"> <a className="nav-link" href="/telegramauth">Telegram</a></li>
                             </ul>
+                            <p onClick={handleteleLogout} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">Logout Telegram</p>
                         </div>
                     </li>
                 </ul>
             </nav>
             <div className="main-panel">
                 <div className="content-wrapper">
-                    {teleuser?.phone && (
+                    {teleuser && (
                         <div>
                             {!channelInfo ? (
                                 <div className="container-scroller">
@@ -101,12 +118,12 @@ export default function Home() {
                                                     <div className="auth-form-light text-center p-5 ">
                                                         <h1 className="pb-3">Onetapay</h1>
                                                         <h6 className="font-weight-light">Create new channel</h6>
-                                                        <form className="pt-3" style={{ display: !flag ? "block" : "none"}}>
+                                                        <form className="pt-3" style={{ display: !flag ? "block" : "none" }}>
                                                             <div className="form-group">
                                                                 <input type="text" className="form-control form-control-lg" id="exampleInputEmail1" placeholder="Channel Name" onChange={(e) => setCtitle(e.target.value)} />
                                                             </div>
                                                             <div className="form-group">
-                                                                <input type="text" className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Channel's description" onChange={(e) => {setCdesc(e.target.value)}} />
+                                                                <input type="text" className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Channel's description" onChange={(e) => { setCdesc(e.target.value) }} />
                                                             </div>
                                                             <div className="mt-3">
                                                                 <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => { handleCreateChannel() }}>Create Channel</p>
@@ -114,8 +131,8 @@ export default function Home() {
                                                             <div className="text-center mt-4 font-weight-light"> Already have a Channel? <p className="text-primary" onClick={() => { setFlag(true); getExistingChannels(); }}>Connect</p>
                                                             </div>
                                                         </form>
-                                                        <form className="pt-3" style={{ display: flag ? "block" : "none"}}>
-                                                            <select className="form-control" id="exampleFormControlSelect2" onChange={(e) => {setEchannel(e.target.value)}}>
+                                                        <form className="pt-3" style={{ display: flag ? "block" : "none" }}>
+                                                            <select className="form-control" id="exampleFormControlSelect2" onChange={(e) => { setEchannel(e.target.value) }}>
                                                                 <option>Select telegram channel</option>
                                                                 {existingChannels.map((channel) => {
                                                                     if (channel.creator) {
@@ -126,7 +143,7 @@ export default function Home() {
                                                                 })}
                                                             </select>
                                                             <div className="mt-3">
-                                                                <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => {handleExistingChannels()}}>Connect to this Channel</p>
+                                                                <p className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" onClick={() => { handleExistingChannels() }}>Connect to this Channel</p>
                                                             </div>
                                                             <div className="text-center mt-4 font-weight-light"> Create a new Channel? <p className="text-primary" onClick={() => { setFlag(false) }}>Create</p>
                                                             </div>
@@ -138,79 +155,78 @@ export default function Home() {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="page-header">
-                                    <h2 className="h3"> channel created </h2>
-                                </div>
+                                <>
+                                    <form className="pt-3 w-25 my-3">
+                                        <select className="form-control" id="exampleFormControlSelect2" onChange={(e) => { setDchannel(e.target.value) }}>
+                                            <option>Select telegram channel to view it's stats</option>
+                                            {channelInfo?.map((channel) => {
+                                                return <option key={channel.id} value={channel.id}>{channel.name}</option>
+                                            })}
+                                        </select>
+                                    </form>
+                                    <div className="row">
+                                        <div className="col-md-3 grid-margin stretch-card">
+                                            <div className="card  border anyl border-white bg-success text-white text-center">
+                                                <div className="card-body p-3">
+                                                    <h2 className="h2">0 ₹</h2>
+                                                    <div className="media mt-3">
+                                                        <div className="media-body">
+                                                            <p className="card-text">Total Earnings</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 grid-margin stretch-card">
+                                            <div className="card  border anyl border-white   text-center">
+                                                <div className="card-body p-3">
+                                                    <h2 className="h2">0 ₹</h2>
+                                                    <div className="media mt-3">
+                                                        <div className="media-body">
+                                                            <p className="card-text">Subscription Earnings</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 grid-margin stretch-card">
+                                            <div className="card  border anyl border-white text-center">
+                                                <div className="card-body p-3">
+                                                    <h2 className="h2">0 ₹</h2>
+                                                    <div className="media mt-3">
+                                                        <div className="media-body">
+                                                            <p className="card-text">Locked Content Earnings</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 grid-margin stretch-card">
+                                            <div className="card  border anyl border-white text-center">
+                                                <div className="card-body p-3">
+                                                    <h2 className="h2">0 ₹</h2>
+                                                    <div className="media mt-3">
+                                                        <div className="media-body">
+                                                            <p className="card-text">Course Earnings</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-md-12 grid-margin stretch-card" >
+                                            <div className="card    bdtp  text-center">
+                                                <div className="card-body p-3 " style={{ height: '50vh' }}>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
                             )}
                         </div>
                     )}
-                    {userChannelMaganagedThroughBot
-                        ?
-                        <>
-                            <div className="row">
-                                <div className="col-md-3 grid-margin stretch-card">
-                                    <div className="card  border anyl border-white bg-success text-white text-center">
-                                        <div className="card-body p-3">
-                                            <h2 className="h2">0 ₹</h2>
-                                            <div className="media mt-3">
-                                                <div className="media-body">
-                                                    <p className="card-text">Total Earnings</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-3 grid-margin stretch-card">
-                                    <div className="card  border anyl border-white   text-center">
-                                        <div className="card-body p-3">
-                                            <h2 className="h2">0 ₹</h2>
-                                            <div className="media mt-3">
-                                                <div className="media-body">
-                                                    <p className="card-text">Subscription Earnings</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-3 grid-margin stretch-card">
-                                    <div className="card  border anyl border-white text-center">
-                                        <div className="card-body p-3">
-                                            <h2 className="h2">0 ₹</h2>
-                                            <div className="media mt-3">
-                                                <div className="media-body">
-                                                    <p className="card-text">Locked Content Earnings</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-3 grid-margin stretch-card">
-                                    <div className="card  border anyl border-white text-center">
-                                        <div className="card-body p-3">
-                                            <h2 className="h2">0 ₹</h2>
-                                            <div className="media mt-3">
-                                                <div className="media-body">
-                                                    <p className="card-text">Course Earnings</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-md-12 grid-margin stretch-card" >
-                                    <div className="card    bdtp  text-center">
-                                        <div className="card-body p-3 " style={{ height: '50vh' }}>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </>
-                        :
-                        <>
-
-                        </>}
                 </div>
                 <footer className="footer">
                     <div className="d-sm-flex justify-content-center justify-content-sm-between">

@@ -34,12 +34,17 @@ export const authSlice = createSlice({
             state.sessionString = action.payload.sessionString;
         },
 
+        setTeleUserLogout: (state) => {
+            state.teleuser = null;
+            state.sessionString = null;
+        },
+
         setChannelInfo: (state, action) => {
             state.channelInfo = action.payload.channelInfo;
         }
     }
 });
 
-export const { setLogin, setUser, setTeleUser, setLogout, setChannelInfo } = authSlice.actions;
+export const { setLogin, setUser, setTeleUser, setLogout, setChannelInfo, setTeleUserLogout } = authSlice.actions;
 
 export default authSlice.reducer;

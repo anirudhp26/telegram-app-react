@@ -20,7 +20,7 @@ export default function TelegramAuth() {
     const sendOtp = async () => {
         if (phonenumber === "" || phonenumber === undefined) return;
         try {
-            const responce = await axios.post("https://telegram-app-react.vercel.app/sendCode", {
+            const responce = await axios.post(`${process.env.REACT_APP_API_URL}/sendCode`, {
                 phonenumber: phonenumber,
             });
             setSendcodeRes(responce.data);
@@ -28,6 +28,7 @@ export default function TelegramAuth() {
             setFlag(true);
         } catch (error) {
             console.log(error);
+            navigate("/telegramauth");
         }
     };
 
@@ -35,17 +36,18 @@ export default function TelegramAuth() {
         if (code === "" || code === null || code.length !== 5) return;
         try {
             const responce_after_otp = await axios.post(
-                "https://telegram-app-react.vercel.app/verifyCode",
+                `${process.env.REACT_APP_API_URL}/verifyCode`,
                 { phonenumber: phonenumber, code: code, phoneCodeHash: sendCodeRes.result.phoneCodeHash }
             );
             console.log(responce_after_otp);
             dispatch(setTeleUser({
-                teleuser: responce_after_otp.data.result.user,
+                teleuser: responce_after_otp.data.user[0],
                 sessionString: responce_after_otp.data.sessionString
             }))
             navigate("/");
         } catch (error) {
             console.log(error);
+            navigate("/telegramauth");
         }
     }
     return (
