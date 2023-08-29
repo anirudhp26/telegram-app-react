@@ -3,12 +3,12 @@ const bodyParser = require("body-parser");
 const { Api, TelegramClient } = require("telegram");
 const { StringSession } = require("telegram/sessions");
 const cors = require("cors");
-const { chats } = require("telegram/client");
 const mysql = require("mysql");
-
+const Telebot = require('node-telegram-bot-api');
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+const bottoken = '6390332681:AAH7N0V7fVdZ3xjiyKVDmGzYt1JuKFr5EvU';
+const bot = new Telebot(bottoken, { polling: true });
 app.use(
 	cors({
 		origin: [
@@ -35,6 +35,7 @@ const stringSession = new StringSession(""); // fill this later with the value f
 const client = new TelegramClient(stringSession, apiId, apiHash, {
 	connectionRetries: 5,
 });
+
 
 function userinfo(id) {
 	const q = `SELECT * FROM users WHERE id = ${id}`;
@@ -131,9 +132,16 @@ app.post("/verifyCode", async (req, res) => {
 	}
 });
 
-// app.post("/afterUserLoginInfo", (res, res) =>{
-
-// })
+app.post('/getjoinchannellink', (req,res) => {
+	const channelId = req.body.channelId;
+	bot.createChatInviteLink(`@${channelId}`)
+    .then(inviteLink => {
+        console.log('Invite link:', inviteLink);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+})
 
 app.post("/telegramlogout", async (req, res) => {
 	const { sessionString } = req.body;
@@ -183,6 +191,7 @@ app.post("/createChannel", async (req, res) => {
 					pinMessages: true,
 					addAdmins: true,
 					manageCall: true,
+					inviteUsers: true,
 				}),
 				rank: "Admin",
 			})
@@ -193,23 +202,23 @@ app.post("/createChannel", async (req, res) => {
 			if (gerr) {
 				res.status(201).json({ status: "error", gerr });
 			} else {
-                const channels = JSON.parse(gres[0].managed_channels_by_bot);
+				const channels = JSON.parse(gres[0].managed_channels_by_bot);
 				channels.channels.push({
 					id: createChannelResponse.chats[0].id,
 					accessHash: createChannelResponse.chats[0].accessHash,
-                    name: createChannelResponse.chats[0].title
+					name: createChannelResponse.chats[0].title
 				});
-                const qupdate = `UPDATE users SET managed_channels_by_bot = '${JSON.stringify(
-                    channels
-                )}' WHERE (id = ${userid});`;
-                gres[0].managed_channels_by_bot = channels;
-                mysqlcon.query(qupdate, (uerr, uresponce) => {
-                    if (uerr) {
-                        res.status(201).json(uerr);
-                    } else {
-                        res.status(200).json({ status: 'ok', user: gres});
-                    }
-                });
+				const qupdate = `UPDATE users SET managed_channels_by_bot = '${JSON.stringify(
+					channels
+				)}' WHERE (id = ${userid});`;
+				gres[0].managed_channels_by_bot = channels;
+				mysqlcon.query(qupdate, (uerr, uresponce) => {
+					if (uerr) {
+						res.status(201).json(uerr);
+					} else {
+						res.status(200).json({ status: 'ok', user: gres });
+					}
+				});
 			}
 		});
 	} catch (error) {

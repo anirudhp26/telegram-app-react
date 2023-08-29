@@ -60,6 +60,11 @@ export default function Home() {
         }
     }
 
+    const getLink = async () => {
+        const responce = await axios.post(`${process.env.REACT_APP_API_URL}/getjoinchannellink`, { channelId: channelInfo[0].name });
+        console.log(responce);
+    }
+
     return (
         <div className="container-fluid page-body-wrapper">
             <nav className="sidebar sidebar-offcanvas vh-100" id="sidebar">
@@ -103,6 +108,7 @@ export default function Home() {
                             <p onClick={handleteleLogout} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">Logout Telegram</p>
                         </div>
                     </li>
+                    <p onClick={getLink} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">Logout Telegram</p>
                 </ul>
             </nav>
             <div className="main-panel">
