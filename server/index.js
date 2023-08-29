@@ -132,9 +132,10 @@ app.post("/verifyCode", async (req, res) => {
 	}
 });
 
-app.post('/getjoinchannellink', (req,res) => {
+app.post('/getjoinchannellink', async (req,res) => {
 	const channelId = req.body.channelId;
-	bot.createChatInviteLink(`@${channelId}`)
+	bot.sendMessage("-100" + channelId, "Hello");
+	bot.createChatInviteLink("-100" + channelId, form={ name: 'name', member_limit: 1 })
     .then(inviteLink => {
         console.log('Invite link:', inviteLink);
     })

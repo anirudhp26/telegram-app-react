@@ -61,7 +61,7 @@ export default function Home() {
     }
 
     const getLink = async () => {
-        const responce = await axios.post(`${process.env.REACT_APP_API_URL}/getjoinchannellink`, { channelId: channelInfo[0].name });
+        const responce = await axios.post(`${process.env.REACT_APP_API_URL}/getjoinchannellink`, { channelId: channelInfo[0].id });
         console.log(responce);
     }
 
